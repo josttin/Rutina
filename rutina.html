@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Mi Rutina 🔥</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --card: #1c1c1c;
+      --accent: #ff3d00;
+      --accent2: #ff8a00;
+      --text: #f5f5f5;
+      --muted: #888;
+      --done: #22c55e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, #1a0800 0%, #0a0a0a 60%);
+      padding: 32px 20px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(255,61,0,0.3) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      line-height: 1;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff 0%, #ff8a00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .streak-badge {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 16px;
+      padding: 8px 14px;
+      text-align: center;
+      min-width: 64px;
+    }
+    .streak-badge .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      line-height: 1;
+      color: #fff;
+    }
+    .streak-badge .label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.85);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .date-line {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* PROGRESS BAR */
+    .progress-wrap {
+      padding: 16px 20px 8px;
+    }
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .progress-bar {
+      height: 6px;
+      background: #2a2a2a;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 99px;
+      transition: width 0.5s cubic-bezier(.4,0,.2,1);
+      width: 0%;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      padding: 8px 18px;
+      border-radius: 99px;
+      border: 1.5px solid #2a2a2a;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* SECTION */
+    .section {
+      display: none;
+      padding: 8px 20px 100px;
+      animation: fadeUp 0.3s ease;
+    }
+    .section.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* MODE LABEL */
+    .mode-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    /* EXERCISE CARD */
+    .ex-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1.5px solid transparent;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .ex-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .ex-card:active { transform: scale(0.98); }
+    .ex-card.done {
+      border-color: rgba(34,197,94,0.3);
+      background: rgba(34,197,94,0.07);
+    }
+    .ex-card.done::before { opacity: 0; }
+    .ex-card.done .ex-dot {
+      background: var(--done);
+      border-color: var(--done);
+    }
+    .ex-card.done .ex-dot::after {
+      content: '✓';
+      font-size: 14px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .ex-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 2px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+      transition: all 0.25s;
+      background: var(--surface);
+    }
+    .ex-info { flex: 1; }
+    .ex-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .ex-card.done .ex-name {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+    .ex-reps {
+      font-size: 13px;
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .ex-card.done .ex-reps { color: var(--muted); }
+
+    /* GROUP DIVIDER */
+    .group-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin: 20px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .group-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #2a2a2a;
+    }
+
+    /* COMPLETE BUTTON */
+    .btn-complete {
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 24px rgba(255,61,0,0.3);
+    }
+    .btn-complete:active { transform: scale(0.97); }
+    .btn-complete:disabled {
+      background: #2a2a2a;
+      color: var(--muted);
+      box-shadow: none;
+    }
+
+    /* RESET */
+    .btn-reset {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1.5px solid #2a2a2a;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+    .btn-reset:active { background: #1a1a1a; }
+
+    /* STATS TAB */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .stat-card .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+    .weekly-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .day-col {
+      flex: 1;
+      text-align: center;
+    }
+    .day-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      background: #2a2a2a;
+    }
+    .day-dot.done-day { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+    .day-dot.today { border: 2px solid var(--accent); }
+    .day-name {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--done);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 99px;
+      font-size: 15px;
+      font-weight: 700;
+      opacity: 0;
+      transition: all 0.4s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 100;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid #1e1e1e;
+      display: flex;
+      padding: 8px 20px 20px;
+      gap: 8px;
+      z-index: 50;
+    }
+    .nav-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .nav-btn.active { color: var(--accent); }
+    .nav-btn .icon { font-size: 22px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <h1>MI<br>RUTINA</h1>
+    <div class="streak-badge">
+      <div class="num" id="streakNum">0</div>
+      <div class="label">Racha 🔥</div>
+    </div>
+  </div>
+  <div class="date-line" id="dateLine"></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-info">
+    <span>Progreso hoy</span>
+    <span id="progressText">0 / 0</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showSection('s1', this)">⚡ 5 min</button>
+  <button class="tab" onclick="showSection('s2', this)">☀️ 5+5 min</button>
+  <button class="tab" onclick="showSection('s3', this)">💪 Día bueno</button>
+  <button class="tab" onclick="showSection('stats', this)">📊 Stats</button>
+</div>
+
+<!-- SECTION 1 -->
+<div class="section active" id="s1">
+  <div class="mode-label">Mínimo diario</div>
+  <div id="exList1"></div>
+  <button class="btn-complete" id="btn1" onclick="completeRoutine('s1')">Completar rutina</button>
+  <button class="btn-reset" onclick="resetSection('s1')">Reiniciar</button>
+</div>
+
+<!-- SECTION 2 -->
+<div class="section" id="s2">
+  <div class="mode-label">Doble sesión</div>
+  <div class="group-label">Medio día</div>
+  <div id="exList2a"></div>
+  <div class="group-label">Noche</div>
+  <div id="exList2b"></div>
+  <button class="btn-complete" id="btn2" onclick="completeRoutine('s2')">Completar rutina</button>
+  <button class="btn-reset" onclick="resetSection('s2')">Reiniciar</button>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section" id="s3">
+  <div class="mode-label">Modo bestia — 3–4 rondas</div>
+  <div id="exList3"></div>
+  <button class="btn-complete" id="btn3" onclick="completeRoutine('s3')">Completar rutina</button>
+  <button class="btn-reset" onclick="resetSection('s3')">Reiniciar</button>
+</div>
+
+<!-- STATS -->
+<div class="section" id="stats">
+  <div class="mode-label">Tu progreso</div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num" id="totalDays">0</div>
+      <div class="stat-label">Días completados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="streakStat">0</div>
+      <div class="stat-label">Racha actual 🔥</div>
+    </div>
+  </div>
+  <div class="weekly-grid" id="weeklyGrid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const DATA = {
+    s1: [
+      { emoji: '🦵', name: 'Sentadillas', reps: '15 reps' },
+      { emoji: '💪', name: 'Flexiones', reps: '5–10 reps' },
+      { emoji: '🔥', name: 'Abdominales', reps: '15 reps' },
+      { emoji: '🏋️', name: 'Búlgara', reps: '8 / pierna' },
+      { emoji: '🏃', name: 'Trote', reps: '30 seg' },
+    ],
+    s2a: [
+      { emoji: '🦵', name: 'Sentadillas', reps: 'Al fallo' },
+      { emoji: '✂️', name: 'Tijeras', reps: '10 / pierna' },
+      { emoji: '🏃', name: 'Trote', reps: '1 min' },
+    ],
+    s2b: [
+      { emoji: '💪', name: 'Flexiones', reps: 'Al fallo' },
+      { emoji: '🔥', name: 'Abdominales', reps: '20 reps' },
+      { emoji: '🏋️', name: 'Búlgara', reps: '8 / pierna' },
+      { emoji: '🧗', name: 'Climbers', reps: '30 seg' },
+    ],
+    s3: [
+      { emoji: '💪', name: 'Flexiones', reps: 'Al fallo' },
+      { emoji: '🦵', name: 'Sentadillas', reps: '20 reps' },
+      { emoji: '🏋️', name: 'Búlgara', reps: '10 / pierna' },
+      { emoji: '✂️', name: 'Tijeras', reps: '10 / pierna' },
+      { emoji: '🔥', name: 'Abdominales', reps: '20 reps' },
+      { emoji: '🧗', name: 'Climbers', reps: '40 seg' },
+    ],
+  };
+
+  let state = JSON.parse(localStorage.getItem('rutinaState') || '{}');
+  if (!state.done) state.done = {};
+  if (!state.streak) state.streak = 0;
+  if (!state.totalDays) state.totalDays = 0;
+  if (!state.lastDate) state.lastDate = '';
+  if (!state.weekDays) state.weekDays = {};
+
+  function save() { localStorage.setItem('rutinaState', JSON.stringify(state)); }
+
+  function todayKey() {
+    const d = new Date();
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  }
+
+  function buildList(containerId, exercises, sectionKey) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = '';
+    exercises.forEach((ex, i) => {
+      const key = `${sectionKey}_${i}`;
+      const done = (state.done[todayKey()] || {})[key];
+      const card = document.createElement('div');
+      card.className = 'ex-card' + (done ? ' done' : '');
+      card.onclick = () => toggleEx(key, card, sectionKey);
+      card.innerHTML = `
+        <div class="ex-dot">${done ? '' : ex.emoji}</div>
+        <div class="ex-info">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-reps">${ex.reps}</div>
+        </div>
+      `;
+      el.appendChild(card);
+    });
+  }
+
+  function toggleEx(key, card, sectionKey) {
+    if (!state.done[todayKey()]) state.done[todayKey()] = {};
+    const current = state.done[todayKey()][key];
+    state.done[todayKey()][key] = !current;
+    save();
+    card.classList.toggle('done');
+    const dot = card.querySelector('.ex-dot');
+    const allExercises = getAllExercises(sectionKey);
+    const idx = parseInt(key.split('_')[1]);
+    if (!current) {
+      dot.innerHTML = '';
+      dot.style.background = 'var(--done)';
+      dot.style.borderColor = 'var(--done)';
+      dot.innerHTML = '<span style="color:#fff;font-size:14px;font-weight:700">✓</span>';
+    } else {
+      dot.style.background = '';
+      dot.style.borderColor = '';
+      dot.innerHTML = allExercises[idx]?.emoji || '';
+    }
+    updateProgress(sectionKey);
+  }
+
+  function getAllExercises(sectionKey) {
+    if (sectionKey === 's1') return DATA.s1;
+    if (sectionKey === 's2') return [...DATA.s2a, ...DATA.s2b];
+    if (sectionKey === 's3') return DATA.s3;
+    return [];
+  }
+
+  function countDone(sectionKey) {
+    const td = todayKey();
+    const dayDone = state.done[td] || {};
+    const exs = getAllExercises(sectionKey);
+    return exs.filter((_, i) => dayDone[`${sectionKey}_${i}`]).length;
+  }
+
+  function updateProgress(sectionKey) {
+    const total = getAllExercises(sectionKey).length;
+    const done = countDone(sectionKey);
+    document.getElementById('progressText').textContent = `${done} / ${total}`;
+    document.getElementById('progressFill').style.width = total ? `${(done/total)*100}%` : '0%';
+    const btn = document.getElementById(sectionKey.replace('s', 'btn'));
+    if (btn) btn.disabled = done < total;
+  }
+
+  function completeRoutine(sectionKey) {
+    const today = todayKey();
+    const key = `completed_${sectionKey}_${today}`;
+    if (state[key]) return;
+    state[key] = true;
+
+    // Update streak
+    const yesterday = (() => {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    })();
+    if (state.lastDate === yesterday) {
+      state.streak = (state.streak || 0) + 1;
+    } else if (state.lastDate !== today) {
+      state.streak = 1;
+    }
+    if (state.lastDate !== today) {
+      state.totalDays = (state.totalDays || 0) + 1;
+      state.lastDate = today;
+      state.weekDays[today] = true;
+    }
+    save();
+    document.getElementById('streakNum').textContent = state.streak;
+    updateStats();
+    showToast('¡Rutina completada! 🔥');
+  }
+
+  function resetSection(sectionKey) {
+    const td = todayKey();
+    if (!state.done[td]) return;
+    const exs = getAllExercises(sectionKey);
+    exs.forEach((_, i) => { delete state.done[td][`${sectionKey}_${i}`]; });
+    save();
+    renderAll(sectionKey);
+    updateProgress(sectionKey);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function showSection(id, tabEl) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    tabEl.classList.add('active');
+
+    const map = { s1: 's1', s2: 's2', s3: 's3' };
+    if (map[id]) updateProgress(map[id]);
+    if (id === 'stats') updateStats();
+  }
+
+  function renderAll(activeSection) {
+    buildList('exList1', DATA.s1, 's1');
+    buildList('exList2a', DATA.s2a, 's2');
+    buildList('exList2b', DATA.s2b, 's2');
+    buildList('exList3', DATA.s3, 's3');
+    // fix s2 indices
+    buildS2();
+  }
+
+  function buildS2() {
+    // s2a uses indices 0..2, s2b uses 3..6 under key 's2'
+    const el2a = document.getElementById('exList2a');
+    const el2b = document.getElementById('exList2b');
+    el2a.innerHTML = ''; el2b.innerHTML = '';
+    DATA.s2a.forEach((ex, i) => {
+      const key = `s2_${i}`;
+      const done = (state.done[todayKey()] || {})[key];
+      el2a.appendChild(makeCard(ex, key, 's2', done));
+    });
+    DATA.s2b.forEach((ex, i) => {
+      const idx = DATA.s2a.length + i;
+      const key = `s2_${idx}`;
+      const done = (state.done[todayKey()] || {})[key];
+      el2b.appendChild(makeCard(ex, key, 's2', done));
+    });
+  }
+
+  function makeCard(ex, key, sectionKey, done) {
+    const allEx = getAllExercises(sectionKey);
+    const idx = parseInt(key.split('_')[1]);
+    const card = document.createElement('div');
+    card.className = 'ex-card' + (done ? ' done' : '');
+    card.onclick = () => toggleEx(key, card, sectionKey);
+    card.innerHTML = `
+      <div class="ex-dot" style="${done ? 'background:var(--done);border-color:var(--done)' : ''}">
+        ${done ? '<span style="color:#fff;font-size:14px;font-weight:700">✓</span>' : ex.emoji}
+      </div>
+      <div class="ex-info">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-reps">${ex.reps}</div>
+      </div>
+    `;
+    return card;
+  }
+
+  function updateStats() {
+    document.getElementById('totalDays').textContent = state.totalDays || 0;
+    document.getElementById('streakStat').textContent = state.streak || 0;
+    buildWeekly();
+  }
+
+  function buildWeekly() {
+    const grid = document.getElementById('weeklyGrid');
+    grid.innerHTML = '';
+    const days = ['D','L','M','X','J','V','S'];
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      const isToday = i === 0;
+      const isDone = !!state.weekDays[key];
+      const col = document.createElement('div');
+      col.className = 'day-col';
+      col.innerHTML = `
+        <div class="day-dot ${isDone ? 'done-day' : ''} ${isToday ? 'today' : ''}">
+          ${isDone ? '✓' : ''}
+        </div>
+        <div class="day-name">${days[d.getDay()]}</div>
+      `;
+      grid.appendChild(col);
+    }
+  }
+
+  // Date line
+  const now = new Date();
+  const opts = { weekday: 'long', day: 'numeric', month: 'long' };
+  document.getElementById('dateLine').textContent = now.toLocaleDateString('es-ES', opts);
+  document.getElementById('streakNum').textContent = state.streak || 0;
+
+  // Initial render
+  buildList('exList1', DATA.s1, 's1');
+  buildS2();
+  buildList('exList3', DATA.s3, 's3');
+  updateProgress('s1');
+  updateStats();
+</script>
+</body>
+</html>
